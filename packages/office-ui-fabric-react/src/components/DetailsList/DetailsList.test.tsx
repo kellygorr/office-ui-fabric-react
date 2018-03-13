@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
-import * as ReactTestUtils from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
 import {
@@ -49,7 +48,7 @@ describe('DetailsList', () => {
     jest.useFakeTimers();
 
     let component: any;
-    const wrapper = mount(
+    mount(
       <DetailsList
         items={ mockItems(5) }
         // tslint:disable-next-line:jsx-no-lambda
@@ -62,8 +61,8 @@ describe('DetailsList', () => {
     expect(component).toBeDefined();
     (component as IDetailsList).focusIndex(2);
     setTimeout(() => {
-      expect(document.activeElement.className.split(' ')).toContain('ms-DetailsRow');
       expect(document.activeElement.textContent).toEqual('2');
+      expect(document.activeElement.className.split(' ')).toContain('ms-DetailsRow');
     }, 0);
     jest.runOnlyPendingTimers();
   });
@@ -74,7 +73,6 @@ describe('DetailsList', () => {
       if (value === null || value === undefined) {
         value = '';
       }
-      console.log('Rendered column');
       return (
         <div className={ 'test-column' } data-is-focusable={ true } >
           { value }
@@ -85,7 +83,7 @@ describe('DetailsList', () => {
     jest.useFakeTimers();
 
     let component: any;
-    const wrapper = mount(
+    mount(
       <DetailsList
         items={ mockItems(5) }
         // tslint:disable-next-line:jsx-no-lambda
@@ -97,17 +95,26 @@ describe('DetailsList', () => {
       />);
 
     expect(component).toBeDefined();
-    (component as IDetailsList).focusIndex(2);
+    (component as IDetailsList).focusIndex(3);
     setTimeout(() => {
+      expect(document.activeElement.textContent).toEqual('3');
       expect(document.activeElement.className.split(' ')).toContain('ms-DetailsRow');
-      expect(document.activeElement.textContent).toEqual('2');
     }, 0);
     jest.runOnlyPendingTimers();
 
-    (component as IDetailsList).focusIndex(2, true);
+    // Set element visibility manually as a test workaround
+    (component as IDetailsList).focusIndex(4);
     setTimeout(() => {
+      (document.activeElement.children[1] as any).isVisible = true;
+      (document.activeElement.children[1].children[0] as any).isVisible = true;
+      (document.activeElement.children[1].children[0].children[0] as any).isVisible = true;
+    }, 0);
+
+    jest.runOnlyPendingTimers();
+    (component as IDetailsList).focusIndex(4, true);
+    setTimeout(() => {
+      expect(document.activeElement.textContent).toEqual('4');
       expect(document.activeElement.className.split(' ')).toContain('test-column');
-      expect(document.activeElement.textContent).toEqual('2');
     }, 0);
     jest.runOnlyPendingTimers();
   });
